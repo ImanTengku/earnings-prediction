@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Earnings Prediction — ML Research Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a38;
+    --accent: #6ee7b7;
+    --accent2: #f59e0b;
+    --accent3: #818cf8;
+    --danger: #f87171;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --code-bg: #0d1117;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(110,231,183,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(110,231,183,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 60px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .hero {
+    margin-bottom: 80px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 60px;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 3px 10px;
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    margin-bottom: 20px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 600px;
+    margin-bottom: 32px;
+  }
+
+  .meta-row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .meta-item strong { color: var(--accent2); }
+
+  /* Section headers */
+  .section {
+    margin-bottom: 64px;
+  }
+
+  .section-num {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent3);
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+
+  h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent2);
+    margin: 28px 0 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  p {
+    color: #94a3b8;
+    margin-bottom: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+
+  /* Code blocks */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 24px;
+    overflow-x: auto;
+    margin: 20px 0;
+    font-size: 12.5px;
+    line-height: 1.7;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .comment { color: #4b5563; }
+  .keyword { color: var(--accent3); }
+  .string { color: var(--accent); }
+  .fn { color: var(--accent2); }
+  .num { color: var(--danger); }
+
+  /* Info boxes */
+  .callout {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent3);
+    padding: 20px 24px;
+    margin: 20px 0;
+  }
+
+  .callout.warn {
+    border-left-color: var(--accent2);
+  }
+
+  .callout.danger {
+    border-left-color: var(--danger);
+  }
+
+  .callout-title {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    color: var(--accent3);
+    font-weight: 600;
+  }
+
+  .callout.warn .callout-title { color: var(--accent2); }
+  .callout.danger .callout-title { color: var(--danger); }
+
+  .callout p { margin: 0; font-size: 13px; }
+
+  /* Feature grid */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  @media (max-width: 600px) { .feature-grid { grid-template-columns: 1fr; } }
+
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+
+  .feature-card:hover { border-color: var(--accent); }
+
+  .feature-card h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+
+  .feature-card p { font-size: 12px; color: var(--muted); margin: 0; }
+
+  /* Pipeline flow */
+  .pipeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 24px 0;
+  }
+
+  .pipe-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .pipe-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 32px;
+    flex-shrink: 0;
+  }
+
+  .pipe-dot {
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--accent);
+    background: var(--bg);
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .pipe-line {
+    width: 2px;
+    height: 40px;
+    background: var(--border);
+    margin-top: 4px;
+  }
+
+  .pipe-content {
+    flex: 1;
+    padding-bottom: 32px;
+  }
+
+  .pipe-content h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+
+  .pipe-content p { font-size: 12px; color: var(--muted); margin: 0; }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 12px;
+  }
+
+  th {
+    text-align: left;
+    padding: 10px 16px;
+    background: var(--surface2);
+    color: var(--accent);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    color: #94a3b8;
+    vertical-align: top;
+  }
+
+  tr:hover td { background: var(--surface); }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 48px 0;
+  }
+
+  /* Inline code */
+  .ic {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  /* Badge */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+  .badge.green { background: rgba(110,231,183,0.15); color: var(--accent); }
+  .badge.yellow { background: rgba(245,158,11,0.15); color: var(--accent2); }
+  .badge.purple { background: rgba(129,140,248,0.15); color: var(--accent3); }
+  .badge.red { background: rgba(248,113,113,0.15); color: var(--danger); }
+
+  /* TOC */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+    margin-bottom: 48px;
+  }
+
+  .toc-title {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .toc ol {
+    list-style: none;
+    counter-reset: toc;
+  }
+
+  .toc li {
+    counter-increment: toc;
+    padding: 4px 0;
+    font-size: 12px;
+  }
+
+  .toc li::before {
+    content: "0" counter(toc) " — ";
+    color: var(--accent3);
+  }
+
+  .toc a { color: var(--text); text-decoration: none; }
+  .toc a:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="tag">Research Notebook</div>
+    <h1>Earnings<br><span>Prediction</span></h1>
+    <p class="subtitle">A practitioner's guide to predicting post-earnings price direction and magnitude using technical signals, options flow, and fundamental data.</p>
+    <div class="meta-row">
+      <div class="meta-item">Stack: <strong>yfinance · sklearn · lightgbm</strong></div>
+      <div class="meta-item">Data: <strong>Technical + Options + Fundamentals</strong></div>
+      <div class="meta-item">Target: <strong>Binary → 4-class magnitude</strong></div>
+    </div>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title">Contents</div>
+    <ol>
+      <li><a href="#framing">Problem Framing & Target Definition</a></li>
+      <li><a href="#data">Data Collection Pipeline</a></li>
+      <li><a href="#features">Feature Engineering</a></li>
+      <li><a href="#model">Model Architecture & Training</a></li>
+      <li><a href="#eval">Evaluation & Backtesting</a></li>
+      <li><a href="#gotchas">Gotchas & Pitfalls</a></li>
+      <li><a href="#next">Iteration Roadmap</a></li>
+    </ol>
+  </div>
+
+  <!-- 1. Problem Framing -->
+  <div class="section" id="framing">
+    <div class="section-num">01 — Problem Framing</div>
+    <h2>What Are We Actually Predicting?</h2>
+
+    <p>Earnings moves are driven by the <em>gap between actual results and market expectations</em>. The options market already prices in an "expected move" (EM) via IV — so the real edge is predicting the direction and whether the move exceeds or undershoots that priced-in expectation.</p>
+
+    <div class="callout">
+      <div class="callout-title">Key Insight</div>
+      <p>The expected move = approx ± (ATM straddle price / stock price). Predicting direction is hard; predicting whether vol is over/underpriced relative to the realized move is a different (and potentially easier) signal to trade.</p>
+    </div>
+
+    <h3>Phase 1 — Binary Target</h3>
+    <p>Post-earnings return over N trading days (start with 1-day, also test 5-day):</p>
+    <pre><code><span class="keyword">def</span> <span class="fn">compute_target</span>(df, n_days=<span class="num">1</span>):
+    <span class="comment"># df has a 'close' column and 'earnings_date' flag</span>
+    df[<span class="string">'post_ret'</span>] = df[<span class="string">'close'</span>].shift(-n_days) / df[<span class="string">'close'</span>] - <span class="num">1</span>
+    df[<span class="string">'target_binary'</span>] = (df[<span class="string">'post_ret'</span>] > <span class="num">0</span>).astype(int)
+    <span class="keyword">return</span> df</code></pre>
+
+    <h3>Phase 2 — 4-Class Magnitude</h3>
+    <p>Classify into: <span class="badge red">Big Down</span> <span class="badge yellow">Small Down</span> <span class="badge green">Small Up</span> <span class="badge purple">Big Up</span></p>
+    <pre><code><span class="keyword">def</span> <span class="fn">compute_magnitude_class</span>(ret, threshold=<span class="num">0.04</span>):
+    <span class="comment"># threshold ~ median expected move for S&P500 stocks</span>
+    <span class="keyword">if</span> ret <= -threshold: <span class="keyword">return</span> <span class="num">0</span>   <span class="comment"># Big Down</span>
+    <span class="keyword">elif</span> ret <= <span class="num">0</span>:           <span class="keyword">return</span> <span class="num">1</span>   <span class="comment"># Small Down</span>
+    <span class="keyword">elif</span> ret <= threshold:   <span class="keyword">return</span> <span class="num">2</span>   <span class="comment"># Small Up</span>
+    <span class="keyword">else</span>:                    <span class="keyword">return</span> <span class="num">3</span>   <span class="comment"># Big Up</span>
+
+<span class="comment"># Or: use the options-implied expected move as the threshold
+# so "big" = move > priced-in vol</span>
+<span class="keyword">def</span> <span class="fn">compute_vs_expected</span>(ret, expected_move):
+    <span class="keyword">return</span> <span class="num">1</span> <span class="keyword">if</span> abs(ret) > expected_move <span class="keyword">else</span> <span class="num">0</span></code></pre>
+
+    <div class="callout warn">
+      <div class="callout-title">Threshold choice matters</div>
+      <p>Don't use a fixed threshold. Compute per-ticker historical earnings move volatility, or use the IV-implied expected move for that specific event. This makes the magnitude class economically meaningful.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 2. Data Collection -->
+  <div class="section" id="data">
+    <div class="section-num">02 — Data Collection</div>
+    <h2>Building the Dataset</h2>
+
+    <p>Since each ticker only has ~4 earnings per year, you need breadth. Target 200–500 tickers across sectors, going back 5–8 years. That gives you ~4,000–16,000 observations.</p>
+
+    <h3>Ticker Universe</h3>
+    <pre><code><span class="keyword">import</span> yfinance <span class="keyword">as</span> yf
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Good starting universes</span>
+SP500_URL = <span class="string">"https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"</span>
+sp500 = pd.read_html(SP500_URL)[<span class="num">0</span>][<span class="string">'Symbol'</span>].tolist()
+
+<span class="comment"># Or sector-specific ETF holdings for Russell 2000 small caps
+# Include a mix: large cap, mid cap, small cap, different sectors
+# Avoid: very illiquid tickers, recent IPOs (<2yr history)</span>
+
+<span class="keyword">def</span> <span class="fn">get_price_data</span>(ticker, start=<span class="string">"2017-01-01"</span>):
+    t = yf.Ticker(ticker)
+    hist = t.history(start=start, auto_adjust=<span class="keyword">True</span>)
+    hist.index = hist.index.tz_localize(<span class="keyword">None</span>)
+    <span class="keyword">return</span> hist</code></pre>
+
+    <h3>Earnings Dates</h3>
+    <pre><code><span class="keyword">def</span> <span class="fn">get_earnings_dates</span>(ticker):
+    t = yf.Ticker(ticker)
+    cal = t.get_earnings_dates(limit=<span class="num">40</span>)  <span class="comment"># ~10 years</span>
+    <span class="keyword">if</span> cal <span class="keyword">is None</span>: <span class="keyword">return</span> <span class="keyword">None</span>
+    cal = cal.dropna(subset=[<span class="string">'EPS Actual'</span>])
+    cal.index = pd.to_datetime(cal.index).tz_localize(<span class="keyword">None</span>)
+    cal[<span class="string">'eps_surprise_pct'</span>] = (
+        (cal[<span class="string">'EPS Actual'</span>] - cal[<span class="string">'EPS Estimate'</span>]) / 
+        cal[<span class="string">'EPS Estimate'</span>].abs()
+    )
+    <span class="keyword">return</span> cal
+
+<span class="comment"># yfinance also exposes:
+# t.earnings_history — historical EPS surprises  
+# t.analyst_price_targets — analyst PT revisions
+# t.recommendations — analyst buy/sell changes</span></code></pre>
+
+    <h3>Building the Master Event DataFrame</h3>
+    <pre><code><span class="keyword">def</span> <span class="fn">build_event_dataset</span>(tickers, lookback_days=<span class="num">30</span>):
+    records = []
+    
+    <span class="keyword">for</span> ticker <span class="keyword">in</span> tickers:
+        <span class="keyword">try</span>:
+            price = get_price_data(ticker)
+            earnings = get_earnings_dates(ticker)
+            <span class="keyword">if</span> earnings <span class="keyword">is None or</span> len(earnings) < <span class="num">4</span>: <span class="keyword">continue</span>
+            
+            <span class="keyword">for</span> earn_date <span class="keyword">in</span> earnings.index:
+                <span class="comment"># find the next trading day after earnings</span>
+                future = price[price.index > earn_date]
+                <span class="keyword">if</span> len(future) < <span class="num">6</span>: <span class="keyword">continue</span>
+                
+                post_1d = future.iloc[<span class="num">0</span>][<span class="string">'Close'</span>]
+                post_5d = future.iloc[<span class="num">4</span>][<span class="string">'Close'</span>] <span class="keyword">if</span> len(future)>=<span class="num">5</span> <span class="keyword">else</span> <span class="keyword">None</span>
+                
+                <span class="comment"># pre-earnings window</span>
+                pre = price[price.index <= earn_date].tail(lookback_days)
+                <span class="keyword">if</span> len(pre) < <span class="num">20</span>: <span class="keyword">continue</span>
+                
+                records.append({
+                    <span class="string">'ticker'</span>: ticker,
+                    <span class="string">'earn_date'</span>: earn_date,
+                    <span class="string">'pre_prices'</span>: pre,
+                    <span class="string">'prev_close'</span>: pre.iloc[-<span class="num">1</span>][<span class="string">'Close'</span>],
+                    <span class="string">'post_1d_close'</span>: post_1d,
+                    <span class="string">'post_5d_close'</span>: post_5d,
+                })
+        <span class="keyword">except Exception as</span> e:
+            print(f<span class="string">"Error {ticker}: {e}"</span>)
+            <span class="keyword">continue</span>
+    
+    <span class="keyword">return</span> records</code></pre>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 3. Feature Engineering -->
+  <div class="section" id="features">
+    <div class="section-num">03 — Feature Engineering</div>
+    <h2>Signal Construction</h2>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>📈 Price Momentum</h4>
+        <p>5-day, 10-day, 20-day returns into earnings. Direction of drift often persists or reverses post-announcement.</p>
+      </div>
+      <div class="feature-card">
+        <h4>📊 Volume Anomaly</h4>
+        <p>Ratio of recent volume to 30-day baseline. Unusual accumulation can signal informed flow.</p>
+      </div>
+      <div class="feature-card">
+        <h4>🎯 IV Percentile</h4>
+        <p>Where current IV sits vs its 52-week range. High IV rank = market pricing in big move.</p>
+      </div>
+      <div class="feature-card">
+        <h4>🔢 EPS Surprise</h4>
+        <p>Actual minus consensus, normalized by stock price or estimate. The most direct fundamental signal.</p>
+      </div>
+      <div class="feature-card">
+        <h4>📐 P/C Skew</h4>
+        <p>Put/call open interest or volume ratio. Directional bias of options market participants.</p>
+      </div>
+      <div class="feature-card">
+        <h4>📅 Earnings History</h4>
+        <p>Ticker's own base rate: how often does it beat? How big are its typical moves?</p>
+      </div>
+    </div>
+
+    <h3>Technical Features</h3>
+    <pre><code><span class="keyword">def</span> <span class="fn">compute_technical_features</span>(pre_prices):
+    <span class="comment">"""pre_prices: DataFrame with OHLCV columns, sorted ascending"""</span>
+    close = pre_prices[<span class="string">'Close'</span>]
+    volume = pre_prices[<span class="string">'Volume'</span>]
+    
+    feats = {}
+    
+    <span class="comment"># --- Momentum ---</span>
+    <span class="keyword">for</span> n <span class="keyword">in</span> [<span class="num">5</span>, <span class="num">10</span>, <span class="num">20</span>]:
+        <span class="keyword">if</span> len(close) >= n:
+            feats[f<span class="string">'ret_{n}d'</span>] = close.iloc[-<span class="num">1</span>] / close.iloc[-n] - <span class="num">1</span>
+    
+    <span class="comment"># --- Volatility (realized) ---</span>
+    log_ret = np.log(close / close.shift(<span class="num">1</span>)).dropna()
+    feats[<span class="string">'rvol_10d'</span>] = log_ret.tail(<span class="num">10</span>).std() * np.sqrt(<span class="num">252</span>)
+    feats[<span class="string">'rvol_20d'</span>] = log_ret.tail(<span class="num">20</span>).std() * np.sqrt(<span class="num">252</span>)
+    
+    <span class="comment"># --- Volume anomaly ---</span>
+    vol_baseline = volume.iloc[:-<span class="num">5</span>].mean()  <span class="comment"># exclude last 5 days</span>
+    feats[<span class="string">'vol_ratio_5d'</span>] = volume.tail(<span class="num">5</span>).mean() / (vol_baseline + <span class="num">1e-9</span>)
+    feats[<span class="string">'vol_ratio_1d'</span>] = volume.iloc[-<span class="num">1</span>] / (vol_baseline + <span class="num">1e-9</span>)
+    
+    <span class="comment"># --- RSI (14-day) ---</span>
+    delta = close.diff().dropna()
+    gain = delta.clip(lower=<span class="num">0</span>).ewm(span=<span class="num">14</span>).mean()
+    loss = (-delta.clip(upper=<span class="num">0</span>)).ewm(span=<span class="num">14</span>).mean()
+    rs = gain / (loss + <span class="num">1e-9</span>)
+    feats[<span class="string">'rsi_14'</span>] = <span class="num">100</span> - (<span class="num">100</span> / (<span class="num">1</span> + rs.iloc[-<span class="num">1</span>]))
+    
+    <span class="comment"># --- Price vs moving averages ---</span>
+    feats[<span class="string">'pct_above_ma20'</span>] = close.iloc[-<span class="num">1</span>] / close.tail(<span class="num">20</span>).mean() - <span class="num">1</span>
+    feats[<span class="string">'pct_above_ma50'</span>] = close.iloc[-<span class="num">1</span>] / close.tail(<span class="num">50</span>).mean() - <span class="num">1</span> \
+        <span class="keyword">if</span> len(close) >= <span class="num">50</span> <span class="keyword">else</span> np.nan
+    
+    <span class="comment"># --- ATR (normalized volatility context) ---</span>
+    high = pre_prices[<span class="string">'High'</span>]; low = pre_prices[<span class="string">'Low'</span>]
+    tr = pd.concat([high - low, (high - close.shift()).abs(), 
+                    (low - close.shift()).abs()], axis=<span class="num">1</span>).max(axis=<span class="num">1</span>)
+    feats[<span class="string">'atr_pct'</span>] = tr.tail(<span class="num">14</span>).mean() / close.iloc[-<span class="num">1</span>]
+    
+    <span class="comment"># --- Earnings drift pattern ---
+    # Does the stock usually gap up or down into earnings?</span>
+    feats[<span class="string">'pre5d_direction'</span>] = <span class="num">1</span> <span class="keyword">if</span> feats.get(<span class="string">'ret_5d'</span>, <span class="num">0</span>) > <span class="num">0</span> <span class="keyword">else</span> -<span class="num">1</span>
+    
+    <span class="keyword">return</span> feats</code></pre>
+
+    <h3>Fundamental / Earnings Quality Features</h3>
+    <pre><code><span class="keyword">def</span> <span class="fn">compute_fundamental_features</span>(ticker, earn_date):
+    t = yf.Ticker(ticker)
+    feats = {}
+    
+    <span class="comment"># --- EPS Surprise ---</span>
+    earn_hist = t.get_earnings_dates(limit=<span class="num">20</span>)
+    <span class="keyword">if</span> earn_hist <span class="keyword">is not None</span>:
+        past = earn_hist[earn_hist.index <= earn_date].head(<span class="num">1</span>)
+        <span class="keyword">if</span> not past.empty:
+            row = past.iloc[<span class="num">0</span>]
+            <span class="keyword">if</span> pd.notna(row[<span class="string">'EPS Estimate'</span>]) <span class="keyword">and</span> row[<span class="string">'EPS Estimate'</span>] != <span class="num">0</span>:
+                feats[<span class="string">'eps_surprise_pct'</span>] = (
+                    row[<span class="string">'EPS Actual'</span>] - row[<span class="string">'EPS Estimate'</span>]
+                ) / abs(row[<span class="string">'EPS Estimate'</span>])
+        
+        <span class="comment"># Historical beat rate (last 4 quarters)</span>
+        recent = earn_hist[earn_hist.index < earn_date].head(<span class="num">4</span>)
+        <span class="keyword">if</span> len(recent) >= <span class="num">2</span>:
+            beats = (recent[<span class="string">'EPS Actual'</span>] > recent[<span class="string">'EPS Estimate'</span>]).mean()
+            feats[<span class="string">'hist_beat_rate'</span>] = beats
+        
+        <span class="comment"># EPS trend (improving or declining surprises?)</span>
+        <span class="keyword">if</span> len(recent) >= <span class="num">3</span>:
+            surprises = (
+                (recent[<span class="string">'EPS Actual'</span>] - recent[<span class="string">'EPS Estimate'</span>]) / 
+                recent[<span class="string">'EPS Estimate'</span>].abs()
+            ).dropna().values
+            <span class="keyword">if</span> len(surprises) >= <span class="num">2</span>:
+                feats[<span class="string">'eps_surprise_trend'</span>] = surprises[<span class="num">0</span>] - surprises[-<span class="num">1</span>]
+    
+    <span class="comment"># --- Valuation context from info ---</span>
+    info = t.info
+    feats[<span class="string">'pe_ratio'</span>] = info.get(<span class="string">'trailingPE'</span>, np.nan)
+    feats[<span class="string">'forward_pe'</span>] = info.get(<span class="string">'forwardPE'</span>, np.nan)
+    feats[<span class="string">'peg_ratio'</span>] = info.get(<span class="string">'pegRatio'</span>, np.nan)
+    feats[<span class="string">'revenue_growth'</span>] = info.get(<span class="string">'revenueGrowth'</span>, np.nan)
+    feats[<span class="string">'earnings_growth'</span>] = info.get(<span class="string">'earningsGrowth'</span>, np.nan)
+    feats[<span class="string">'profit_margin'</span>] = info.get(<span class="string">'profitMargins'</span>, np.nan)
+    feats[<span class="string">'return_on_equity'</span>] = info.get(<span class="string">'returnOnEquity'</span>, np.nan)
+    feats[<span class="string">'debt_to_equity'</span>] = info.get(<span class="string">'debtToEquity'</span>, np.nan)
+    feats[<span class="string">'market_cap_log'</span>] = np.log(info.get(<span class="string">'marketCap'</span>, np.nan))
+    feats[<span class="string">'sector'</span>] = info.get(<span class="string">'sector'</span>, <span class="string">'Unknown'</span>)
+    
+    <span class="keyword">return</span> feats</code></pre>
+
+    <h3>Ticker Historical Earnings Behavior</h3>
+    <pre><code><span class="keyword">def</span> <span class="fn">compute_ticker_base_rates</span>(ticker, price_df, earnings_dates, 
+                              current_earn_date):
+    <span class="comment">"""
+    For each event, look at how this specific ticker has moved
+    in previous earnings. This captures idiosyncratic behavior.
+    """</span>
+    feats = {}
+    past_earnings = [d <span class="keyword">for</span> d <span class="keyword">in</span> earnings_dates <span class="keyword">if</span> d < current_earn_date]
+    
+    past_moves = []
+    <span class="keyword">for</span> ed <span class="keyword">in</span> past_earnings[-<span class="num">8</span>:]:  <span class="comment"># last 8 quarters</span>
+        future = price_df[price_df.index > ed]
+        prev   = price_df[price_df.index <= ed]
+        <span class="keyword">if</span> len(future) >= <span class="num">1</span> <span class="keyword">and</span> len(prev) >= <span class="num">1</span>:
+            move = future.iloc[<span class="num">0</span>][<span class="string">'Close'</span>] / prev.iloc[-<span class="num">1</span>][<span class="string">'Close'</span>] - <span class="num">1</span>
+            past_moves.append(move)
+    
+    <span class="keyword">if</span> past_moves:
+        feats[<span class="string">'ticker_avg_abs_move'</span>] = np.mean(np.abs(past_moves))
+        feats[<span class="string">'ticker_avg_move'</span>]     = np.mean(past_moves)
+        feats[<span class="string">'ticker_move_std'</span>]      = np.std(past_moves)
+        feats[<span class="string">'ticker_up_rate'</span>]       = np.mean([m > <span class="num">0</span> <span class="keyword">for</span> m <span class="keyword">in</span> past_moves])
+    
+    <span class="keyword">return</span> feats</code></pre>
+
+    <div class="callout warn">
+      <div class="callout-title">Options IV — Practical Note</div>
+      <p>yfinance provides current options chains via <span class="ic">t.option_chain(date)</span> but doesn't have historical IV. For historical IV percentile, consider: (1) using the term structure of current IV if doing real-time prediction, (2) using realized vol as a proxy for historical implied vol, or (3) commercial data like CBOE options data or Quandl. For backtesting, proxy IV with: 30-day realized vol percentile vs 1-year window.</p>
+    </div>
+
+    <pre><code><span class="comment"># IV proxy using realized vol percentile (for backtesting without historical IV)</span>
+<span class="keyword">def</span> <span class="fn">compute_iv_proxy</span>(close_series, lookback=<span class="num">252</span>):
+    log_ret = np.log(close_series / close_series.shift(<span class="num">1</span>)).dropna()
+    
+    <span class="comment"># rolling 30d realized vol, annualized</span>
+    roll_vol = log_ret.rolling(<span class="num">30</span>).std() * np.sqrt(<span class="num">252</span>)
+    
+    current = roll_vol.iloc[-<span class="num">1</span>]
+    history = roll_vol.iloc[-lookback:]
+    
+    iv_percentile = (history < current).mean()  <span class="comment"># 0-1</span>
+    
+    <span class="comment"># Term structure proxy: short-term vol vs long-term vol</span>
+    st_vol = log_ret.tail(<span class="num">10</span>).std() * np.sqrt(<span class="num">252</span>)
+    lt_vol = log_ret.tail(<span class="num">60</span>).std() * np.sqrt(<span class="num">252</span>)
+    vol_ratio = st_vol / (lt_vol + <span class="num">1e-9</span>)  <span class="comment"># >1 means vol is elevated short-term</span>
+    
+    <span class="keyword">return</span> {
+        <span class="string">'rvol_percentile'</span>: iv_percentile,
+        <span class="string">'rvol_term_ratio'</span>: vol_ratio,
+        <span class="string">'current_rvol'</span>: current,
+    }
+
+<span class="comment"># For live predictions, real options IV is available:
+# chain = t.option_chain('2024-02-16')  # nearest expiry after earnings
+# atm_iv = chain.calls[chain.calls.inTheMoney == False].iloc[0]['impliedVolatility']
+# expected_move = atm_straddle_price / spot_price</span></code></pre>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 4. Model -->
+  <div class="section" id="model">
+    <div class="section-num">04 — Model Architecture</div>
+    <h2>Training the Classifier</h2>
+
+    <p>LightGBM works exceptionally well for tabular financial data: handles missing values natively, provides feature importance, and doesn't overfit as aggressively as neural nets on small datasets. Start here before trying anything fancier.</p>
+
+    <h3>Full Pipeline</h3>
+    <pre><code><span class="keyword">import</span> lightgbm <span class="keyword">as</span> lgb
+<span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> TimeSeriesSplit
+<span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> LabelEncoder
+<span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score, log_loss, roc_auc_score
+<span class="keyword">from</span> sklearn.pipeline <span class="keyword">import</span> Pipeline
+<span class="keyword">from</span> sklearn.impute <span class="keyword">import</span> SimpleImputer
+
+<span class="comment"># --- Assemble feature matrix ---</span>
+<span class="keyword">def</span> <span class="fn">build_feature_matrix</span>(records):
+    rows = []
+    <span class="keyword">for</span> r <span class="keyword">in</span> records:
+        feats = {}
+        feats.update(compute_technical_features(r[<span class="string">'pre_prices'</span>]))
+        feats.update(compute_iv_proxy(r[<span class="string">'pre_prices'</span>][<span class="string">'Close'</span>]))
+        feats.update(compute_fundamental_features(r[<span class="string">'ticker'</span>], r[<span class="string">'earn_date'</span>]))
+        feats.update(compute_ticker_base_rates(...))
+        
+        <span class="comment"># Target</span>
+        ret_1d = r[<span class="string">'post_1d_close'</span>] / r[<span class="string">'prev_close'</span>] - <span class="num">1</span>
+        feats[<span class="string">'target_binary'</span>] = int(ret_1d > <span class="num">0</span>)
+        feats[<span class="string">'target_mag'</span>] = compute_magnitude_class(ret_1d)
+        feats[<span class="string">'earn_date'</span>] = r[<span class="string">'earn_date'</span>]
+        feats[<span class="string">'ticker'</span>] = r[<span class="string">'ticker'</span>]
+        rows.append(feats)
+    
+    df = pd.DataFrame(rows)
+    df = df.sort_values(<span class="string">'earn_date'</span>).reset_index(drop=<span class="keyword">True</span>)
+    <span class="keyword">return</span> df
+
+<span class="comment"># --- Encode categoricals ---</span>
+<span class="keyword">def</span> <span class="fn">prep_for_model</span>(df, cat_cols=[<span class="string">'sector'</span>]):
+    df = df.copy()
+    <span class="keyword">for</span> col <span class="keyword">in</span> cat_cols:
+        le = LabelEncoder()
+        df[col] = le.fit_transform(df[col].fillna(<span class="string">'Unknown'</span>))
+    <span class="keyword">return</span> df
+
+<span class="comment"># --- Time-series cross validation (CRITICAL: no lookahead!) ---</span>
+<span class="keyword">def</span> <span class="fn">train_evaluate</span>(df, target=<span class="string">'target_binary'</span>):
+    feature_cols = [c <span class="keyword">for</span> c <span class="keyword">in</span> df.columns 
+                    <span class="keyword">if</span> c not in [<span class="string">'target_binary'</span>, <span class="string">'target_mag'</span>, 
+                                  <span class="string">'earn_date'</span>, <span class="string">'ticker'</span>]]
+    X = df[feature_cols].values
+    y = df[target].values
+    
+    <span class="comment"># TimeSeriesSplit: always train on past, test on future</span>
+    tscv = TimeSeriesSplit(n_splits=<span class="num">5</span>, gap=<span class="num">10</span>)  <span class="comment"># gap avoids data leakage</span>
+    
+    results = []
+    <span class="keyword">for</span> fold, (train_idx, test_idx) <span class="keyword">in</span> enumerate(tscv.split(X)):
+        X_train, X_test = X[train_idx], X[test_idx]
+        y_train, y_test = y[train_idx], y[test_idx]
+        
+        model = lgb.LGBMClassifier(
+            n_estimators=<span class="num">300</span>,
+            learning_rate=<span class="num">0.05</span>,
+            max_depth=<span class="num">5</span>,
+            num_leaves=<span class="num">31</span>,
+            min_child_samples=<span class="num">20</span>,  <span class="comment"># regularize for small dataset</span>
+            subsample=<span class="num">0.8</span>,
+            colsample_bytree=<span class="num">0.8</span>,
+            class_weight=<span class="string">'balanced'</span>,
+            random_state=<span class="num">42</span>
+        )
+        model.fit(X_train, y_train,
+                  eval_set=[(X_test, y_test)],
+                  callbacks=[lgb.early_stopping(<span class="num">30</span>, verbose=<span class="keyword">False</span>)])
+        
+        preds = model.predict(X_test)
+        proba = model.predict_proba(X_test)[:, <span class="num">1</span>]
+        
+        results.append({
+            <span class="string">'fold'</span>: fold,
+            <span class="string">'accuracy'</span>: accuracy_score(y_test, preds),
+            <span class="string">'auc'</span>: roc_auc_score(y_test, proba),
+            <span class="string">'logloss'</span>: log_loss(y_test, proba),
+        })
+        print(f<span class="string">"Fold {fold}: Acc={results[-1]['accuracy']:.3f}, AUC={results[-1]['auc']:.3f}"</span>)
+    
+    <span class="keyword">return</span> pd.DataFrame(results), model, feature_cols</code></pre>
+
+    <h3>Feature Importance & SHAP</h3>
+    <pre><code><span class="keyword">import</span> shap
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># After training final model on all data</span>
+explainer = shap.TreeExplainer(model)
+shap_values = explainer.shap_values(X_test)
+
+<span class="comment"># Summary plot — shows which features matter most</span>
+shap.summary_plot(shap_values[<span class="num">1</span>], X_test, feature_names=feature_cols)
+
+<span class="comment"># Force plot for a single prediction — great for debugging</span>
+shap.force_plot(explainer.expected_value[<span class="num">1</span>], 
+               shap_values[<span class="num">1</span>][<span class="num">0</span>], X_test[<span class="num">0</span>], feature_names=feature_cols)</code></pre>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 5. Eval -->
+  <div class="section" id="eval">
+    <div class="section-num">05 — Evaluation</div>
+    <h2>Metrics That Actually Matter</h2>
+
+    <p>Accuracy alone is meaningless in finance. What matters is whether high-confidence predictions are profitable after trading costs. Think in terms of calibration and edge, not raw accuracy.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Why It Matters</th>
+          <th>Target</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>AUC-ROC</td>
+          <td>Rank-ordering ability, class-balance robust</td>
+          <td>&gt; 0.55 is interesting</td>
+        </tr>
+        <tr>
+          <td>Calibration curve</td>
+          <td>Are predicted probabilities trustworthy for sizing?</td>
+          <td>Close to diagonal</td>
+        </tr>
+        <tr>
+          <td>Top-decile precision</td>
+          <td>When very confident, what's the hit rate?</td>
+          <td>&gt; 60% is tradeable</td>
+        </tr>
+        <tr>
+          <td>Sharpe (backtest)</td>
+          <td>Risk-adjusted return on a signal-based portfolio</td>
+          <td>&gt; 1.0</td>
+        </tr>
+        <tr>
+          <td>Accuracy by confidence bucket</td>
+          <td>Detect model overconfidence in tails</td>
+          <td>Monotonic</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Simple Backtest Framework</h3>
+    <pre><code><span class="keyword">def</span> <span class="fn">backtest_strategy</span>(df_test, proba, threshold=<span class="num">0.60</span>, 
+                       hold_days=<span class="num">1</span>, cost_bps=<span class="num">20</span>):
+    <span class="comment">"""
+    Long when p(up) > threshold, short when p(up) < (1-threshold).
+    cost_bps: round-trip transaction cost in basis points
+    """</span>
+    df = df_test.copy()
+    df[<span class="string">'proba'</span>] = proba
+    df[<span class="string">'actual_ret'</span>] = ...  <span class="comment"># 1d or 5d return</span>
+    
+    cost = cost_bps / <span class="num">10000</span>
+    
+    <span class="comment"># Signal: +1 long, -1 short, 0 flat</span>
+    df[<span class="string">'signal'</span>] = <span class="num">0</span>
+    df.loc[df[<span class="string">'proba'</span>] > threshold,         <span class="string">'signal'</span>] =  <span class="num">1</span>
+    df.loc[df[<span class="string">'proba'</span>] < (<span class="num">1</span> - threshold),    <span class="string">'signal'</span>] = -<span class="num">1</span>
+    
+    df[<span class="string">'pnl'</span>] = df[<span class="string">'signal'</span>] * df[<span class="string">'actual_ret'</span>] - abs(df[<span class="string">'signal'</span>]) * cost
+    
+    active = df[df[<span class="string">'signal'</span>] != <span class="num">0</span>]
+    
+    print(f<span class="string">"Trades: {len(active)}"</span>)
+    print(f<span class="string">"Win rate: {(active['pnl'] > 0).mean():.2%}"</span>)
+    print(f<span class="string">"Avg return per trade: {active['pnl'].mean():.2%}"</span>)
+    print(f<span class="string">"Annualized Sharpe (assuming 4 trades/qtr): "</span>
+          f<span class="string">"{active['pnl'].mean() / active['pnl'].std() * np.sqrt(len(active)):.2f}"</span>)
+    
+    <span class="comment"># Cumulative PnL</span>
+    active[<span class="string">'cum_pnl'</span>] = active[<span class="string">'pnl'</span>].cumsum()
+    active.plot(x=<span class="string">'earn_date'</span>, y=<span class="string">'cum_pnl'</span>)
+    plt.title(<span class="string">'Cumulative PnL from Earnings Trades'</span>)
+    plt.show()
+    
+    <span class="keyword">return</span> active
+
+<span class="comment"># Calibration check
+from sklearn.calibration import calibration_curve
+prob_true, prob_pred = calibration_curve(y_test, proba, n_bins=10)
+plt.plot(prob_pred, prob_true, 'o-')
+plt.plot([0,1],[0,1], '--', color='gray')
+plt.xlabel('Predicted Probability'); plt.ylabel('Actual Fraction Positive')
+plt.title('Calibration Curve — ideal = diagonal')</span></code></pre>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 6. Gotchas -->
+  <div class="section" id="gotchas">
+    <div class="section-num">06 — Gotchas</div>
+    <h2>Pitfalls to Avoid</h2>
+
+    <div class="pipeline">
+      <div class="pipe-step">
+        <div class="pipe-left">
+          <div class="pipe-dot"></div>
+          <div class="pipe-line"></div>
+        </div>
+        <div class="pipe-content">
+          <h4>Lookahead Bias <span class="badge red">Critical</span></h4>
+          <p>Never use information that wasn't available before earnings. EPS surprise figures sometimes get revised — use point-in-time data. Always sort by date and use TimeSeriesSplit, not random K-fold.</p>
+        </div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-left">
+          <div class="pipe-dot"></div>
+          <div class="pipe-line"></div>
+        </div>
+        <div class="pipe-content">
+          <h4>Survivorship Bias <span class="badge red">Critical</span></h4>
+          <p>If your ticker universe is "current S&P 500 members", you're excluding companies that were dropped (often poorly performing ones). Fetch historical index constituents if possible, or acknowledge this limitation.</p>
+        </div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-left">
+          <div class="pipe-dot"></div>
+          <div class="pipe-line"></div>
+        </div>
+        <div class="pipe-content">
+          <h4>Earnings Date Timing <span class="badge yellow">Important</span></h4>
+          <p>Some companies report pre-market, others after-hours. The "next day open" move can be very different from close-to-close. yfinance doesn't always tag AMC vs BMO — verify this for your sample.</p>
+        </div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-left">
+          <div class="pipe-dot"></div>
+          <div class="pipe-line"></div>
+        </div>
+        <div class="pipe-content">
+          <h4>Class Imbalance <span class="badge yellow">Important</span></h4>
+          <p>The binary target is roughly 50/50 but the 4-class target often skews toward small moves. Use class_weight='balanced', or SMOTE, or adjust decision thresholds post-training.</p>
+        </div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-left">
+          <div class="pipe-dot"></div>
+          <div class="pipe-line"></div>
+        </div>
+        <div class="pipe-content">
+          <h4>Market Regime <span class="badge purple">Context</span></h4>
+          <p>Models trained in low-vol regimes (2013-2019) may fail in high-vol periods (2020, 2022). Add VIX level, market trend, and sector momentum as regime features. Consider training separate models per regime.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 7. Roadmap -->
+  <div class="section" id="next">
+    <div class="section-num">07 — Iteration Roadmap</div>
+    <h2>From MVP to Alpha</h2>
+
+    <table>
+      <thead>
+        <tr><th>Phase</th><th>Goal</th><th>Key Addition</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge green">v1</span> Binary Direction</td>
+          <td>Beat 50% baseline</td>
+          <td>Technical features + EPS surprise</td>
+        </tr>
+        <tr>
+          <td><span class="badge yellow">v2</span> Magnitude Classes</td>
+          <td>Identify big movers</td>
+          <td>IV proxy + ticker history features</td>
+        </tr>
+        <tr>
+          <td><span class="badge purple">v3</span> Beat/Miss vs Expected Move</td>
+          <td>Predict vol over/underpricing</td>
+          <td>Real options IV + expected move calc</td>
+        </tr>
+        <tr>
+          <td><span class="badge red">v4</span> Portfolio Signal</td>
+          <td>Tradeable Sharpe > 1</td>
+          <td>Position sizing by confidence, sector hedges</td>
+        </tr>
+        <tr>
+          <td>v5 NLP Overlay</td>
+          <td>Guidance tone signal</td>
+          <td>LLM sentiment on earnings call transcripts</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Quick Wins to Try First</h3>
+    <pre><code><span class="comment"># 1. Sector dummies — earnings reactions vary hugely by sector
+#    Tech beats rally more than Utility beats on average
+
+# 2. Consecutive beats streak
+#    If a company has beaten 4 quarters in a row, the bar is higher
+
+# 3. Pre-announcement drift reversal
+#    Academic research shows: strong pre-earnings drift often REVERSES
+#    This is the "buy the rumor, sell the news" effect
+feats['drift_reversal_signal'] = -feats.get('ret_5d', 0)
+
+# 4. Seasonality
+#    Q4 earnings (reported in Jan-Feb) tend to have different dynamics
+feats['quarter'] = earn_date.quarter
+
+# 5. Days since last earnings
+#    First quarter after a guidance cut → asymmetric upside
+
+# 6. Market cap bucket
+#    Small caps have more idiosyncratic variance, different analyst coverage
+feats['size_bucket'] = pd.qcut(feats['market_cap_log'], 4, labels=False)</span></code></pre>
+
+    <div class="callout">
+      <div class="callout-title">The Most Actionable Insight</div>
+      <p>Academic literature consistently finds that the <strong>post-earnings announcement drift (PEAD)</strong> — where stocks continue moving in the direction of the earnings surprise for days to weeks — is one of the most robust anomalies in markets. Start by replicating PEAD with a simple EPS surprise rank, then layer in your ML features on top to refine it.</p>
+    </div>
+
+    <h3>Dependencies to Install</h3>
+    <pre><code>pip install yfinance lightgbm shap scikit-learn pandas numpy \
+            matplotlib seaborn tqdm requests lxml
+
+<span class="comment"># For Capital IQ fundamental data (institutional access required):
+# pip install prismstudio  # if you have Capital IQ Pro credentials
+# Or use Compustat/Fundamentals via WRDS if you have academic access
+
+# Free alternatives for fundamental data:
+# - yfinance .info dict (limited but free)
+# - SEC EDGAR API (XBRL filings, completely free)
+# - Simfin API (free tier available)</span></code></pre>
+  </div>
+
+  <hr class="divider">
+
+  <div style="text-align:center; padding: 40px 0; color: var(--muted); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;">
+    Earnings Prediction Research Guide · Built for exploration, not financial advice
+  </div>
+
+</div>
+</body>
+</html>
