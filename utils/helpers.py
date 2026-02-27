@@ -40,7 +40,9 @@ def get_price_data(ticker, start="2019-01-01", end=None):
         df = t.history(start=start, end=end, auto_adjust=True)
         if df.empty or len(df) < 60:
             return None
-        df.index = pd.to_datetime(df.index).tz_localize(None)
+        df.index = pd.to_datetime(df.index)
+        if df.index.tzinfo is not None:
+                df.index = df.index.tz_convert('America/New_York').tz_localize(None)
         df = df[['Open', 'High', 'Low', 'Close', 'Volume']].copy()
         df.columns = ['open', 'high', 'low', 'close', 'volume']
         return df.sort_index()
